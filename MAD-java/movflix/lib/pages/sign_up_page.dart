@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:movflix/widgets/header_widget.dart';
+import 'sign_in_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -131,7 +132,20 @@ class _SignUpPageState extends State<SignUpPage> {
                 borderRadius: BorderRadius.all(Radius.circular(5))
             ),
             child: Text("Continue"),
-          )
+          ),
+          SizedBox(height: 15,),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignInPage()),
+              );
+            },
+            child: Text(
+              "Already have an account? Sign in.",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+            ),
+          ),
         ],
       ),
     );

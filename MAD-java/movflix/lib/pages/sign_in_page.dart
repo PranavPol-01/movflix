@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import 'sign_up_page.dart';
+
 class SignInPage extends StatefulWidget {
   @override
   _SignInPageState createState() => _SignInPageState();
@@ -110,10 +112,16 @@ class _SignInPageState extends State<SignInPage> {
           SizedBox(
             height: 15,
           ),
-          Text(
-            "New to Netflix? Sign up now.",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignUpPage()),
+              );
+            },
+            child: Text(
+              "New to Netflix? Sign up now.",
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
             ),
           ),
           SizedBox(
