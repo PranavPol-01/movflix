@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:movflix/widgets/header_widget.dart';
 import 'sign_in_page.dart';
+import 'package:movflix/screens/homescreen.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -30,13 +31,7 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "STEP 2 OF 3",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[400],
-            ),
-          ),
+
           SizedBox(
             height: 19,
           ),
@@ -48,12 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
               color: Colors.white,
             ),
           ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            "Just Two more steps and you're finished!\nwe hate paperwork, too.",
-          ),
+
           SizedBox(
             height: 10,
           ),
@@ -123,15 +113,25 @@ class _SignUpPageState extends State<SignUpPage> {
             ],
           ),
           SizedBox(height: 15,),
-          Container(
-            width: double.maxFinite,
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.all(Radius.circular(5))
+          InkWell(
+            onTap: () {
+              // Navigate to Home Page and remove all previous routes (SignInPage)
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+                    (route) => false, // Remove all previous routes from the stack
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(vertical: 15),
+              width: double.maxFinite,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(color: Colors.grey[600] ?? Colors.grey, width: 2),
+              ),
+              child: Text("Sign Up"),
             ),
-            child: Text("Continue"),
           ),
           SizedBox(height: 15,),
           GestureDetector(

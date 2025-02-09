@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'sign_up_page.dart';
+import 'package:movflix/screens/homescreen.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -95,15 +96,25 @@ class _SignInPageState extends State<SignInPage> {
           SizedBox(
             height: 15,
           ),
-          Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(vertical: 15),
-            width: double.maxFinite,
-            decoration: BoxDecoration(
+          InkWell(
+            onTap: () {
+              // Navigate to Home Page and remove all previous routes (SignInPage)
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+                    (route) => false, // Remove all previous routes from the stack
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(vertical: 15),
+              width: double.maxFinite,
+              decoration: BoxDecoration(
                 color: Colors.transparent,
-              border: Border.all(color: Colors.grey[600] ?? Colors.grey, width: 2),
+                border: Border.all(color: Colors.grey[600] ?? Colors.grey, width: 2),
+              ),
+              child: Text("Sign In"),
             ),
-            child: Text("Sign In"),
           ),
           SizedBox(
             height: 15,
