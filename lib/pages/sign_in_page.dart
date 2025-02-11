@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 
 import 'sign_up_page.dart';
 import 'package:movflix/screens/homescreen.dart';
+import 'package:movflix/widgets/bottom_bar_nav.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -98,11 +99,17 @@ class _SignInPageState extends State<SignInPage> {
           ),
           InkWell(
             onTap: () {
+
               // Navigate to Home Page and remove all previous routes (SignInPage)
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => HomeScreen()),
                     (route) => false, // Remove all previous routes from the stack
+              );
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const BottomNavBar(),
+                ),
               );
             },
             child: Container(

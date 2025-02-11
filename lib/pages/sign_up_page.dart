@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:movflix/widgets/header_widget.dart';
 import 'sign_in_page.dart';
 import 'package:movflix/screens/homescreen.dart';
+import 'package:movflix/widgets/bottom_bar_nav.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -120,6 +121,11 @@ class _SignUpPageState extends State<SignUpPage> {
                 context,
                 MaterialPageRoute(builder: (context) => HomeScreen()),
                     (route) => false, // Remove all previous routes from the stack
+              );
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const BottomNavBar(),
+                ),
               );
             },
             child: Container(
