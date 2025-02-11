@@ -8,6 +8,8 @@ import 'package:movflix/models/movie_model.dart';
 import 'package:movflix/models/movie_recommendation_model.dart';
 import 'package:movflix/models/search_model.dart';
 import 'package:movflix/models/tv_series_model.dart';
+import 'package:movflix/models/tv_series_detail_model.dart';
+import 'package:movflix/models/tv_series_recommendation_model.dart';
 
 const baseUrl = 'https://api.themoviedb.org/3/';
 var key = '?api_key=$apiKey';
@@ -101,4 +103,31 @@ class ApiServices {
     }
     throw Exception('failed to load  search movie ');
   }
+
+
+
+  Future<TvShowDetailModel> getTvShowDetail(int tvShowId) async {
+    endPoint = 'tv/$tvShowId';
+    final url = '$baseUrl$endPoint$key';
+    print(url);
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      log('Fetched TV show details successfully');
+      return TvShowDetailModel.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to load TV show details');
+  }
+
+  Future<TvShowRecommendationsModel> getTvShowRecommendations(int tvShowId) async {
+    endPoint = 'tv/$tvShowId/recommendations';
+    final url = '$baseUrl$endPoint$key';
+    print(url);
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      log('Fetched TV show recommendations successfully');
+      return TvShowRecommendationsModel.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to load TV show recommendations');
+  }
+
 }

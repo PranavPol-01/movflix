@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
 
     // Navigate after animation ends or 7 seconds max
-    Timer(Duration(seconds: 7), () {
+    Timer(Duration(seconds: 5), () {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => OnBoardingScreen()),
@@ -48,7 +48,9 @@ class _SplashScreenState extends State<SplashScreen> {
               },
             ),
             SizedBox(height: 20),
-            if (showProgressIndicator) CircularProgressIndicator(),
+            if (showProgressIndicator) CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Colors.red),
+            ),
           ],
         ),
       ),

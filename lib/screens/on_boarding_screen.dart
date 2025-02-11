@@ -3,8 +3,6 @@ import 'package:movflix/entities/on_boarding_entity.dart';
 import 'package:movflix/pages/sign_in_page.dart';
 import 'package:movflix/widgets/header_widget.dart';
 
-
-
 class OnBoardingScreen extends StatefulWidget {
   @override
   _OnBoardingScreenState createState() => _OnBoardingScreenState();

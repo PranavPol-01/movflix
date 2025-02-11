@@ -105,7 +105,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 value: _isCheck,
                 onChanged: (value) {
                   setState(() {
-                    _isCheck = value ?? false; // ✅ Ensures non-null value
+                    _isCheck = value ?? false;
                   });
                 },
 
