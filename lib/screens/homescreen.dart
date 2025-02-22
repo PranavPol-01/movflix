@@ -1,4 +1,4 @@
-
+import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:movflix/common/utils.dart';
@@ -8,6 +8,11 @@ import 'package:movflix/screens/search_screen.dart';
 import 'package:movflix/services/api_services.dart';
 import 'package:movflix/widgets/upcoming_movie_card_widget.dart';
 import 'package:movflix/screens/tv_show_detail_screen.dart';
+import 'package:movflix/screens/video_player_screen.dart';
+import 'package:movflix/models/tv_show_video_model.dart';
+import 'package:movflix/screens/on_boarding_screen.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -65,15 +70,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: InkWell(
-              onTap: () {},
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => OnBoardingScreen()),
+                      (route) => false,
+                );
+              },
               child: Container(
-                color: Colors.blue,
+                color: Colors.red, // Change color to indicate logout
                 height: 27,
                 width: 27,
+                child: Icon(Icons.logout, color: Colors.white, size: 20), // Logout icon
               ),
             ),
           ),
           const SizedBox(width: 20),
+
         ],
       ),
       body: SingleChildScrollView(
@@ -134,7 +148,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Row(
                                       children: [
                                         ElevatedButton.icon(
-                                          onPressed: () {},
+                                          onPressed: () async {
+                                            try {
+                                              TvShowVideo videoData = await apiServices.getTvShowVideos(show.id);
+                                              if (videoData.results.isNotEmpty) {
+                                                String videoKey = videoData.results.first.key;  // Get the first video key
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => VideoPlayerScreen(videoKey: videoKey),
+                                                  ),
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  const SnackBar(content: Text("No video available for this TV show")),
+                                                );
+                                              }
+                                            } catch (e) {
+                                              log("Error fetching video: $e");
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text("Failed to fetch video")),
+                                              );
+                                            }
+                                          },
                                           icon: const Icon(Icons.play_arrow),
                                           label: const Text('Play'),
                                           style: ElevatedButton.styleFrom(
@@ -142,26 +178,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                             foregroundColor: Colors.black,
                                           ),
                                         ),
+
                                         const SizedBox(width: 10),
                                         ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => TvShowDetailScreen(
-                                                  showId: show.id,
-                                                ),
+                                                builder: (context) => TvShowDetailScreen(showId: show.id),
                                               ),
                                             );
                                           },
 
-                                          icon: const Icon(Icons.info_outline),
-                                          label: const Text('Info'),
+                                          icon: const Icon(Icons.play_arrow),
+                                          label: const Text('info'),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.grey[800],
-                                            foregroundColor: Colors.white,
+                                            backgroundColor: Colors.white,
+                                            foregroundColor: Colors.black,
                                           ),
                                         ),
+
 
                                       ],
                                     ),

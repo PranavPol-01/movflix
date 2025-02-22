@@ -10,6 +10,9 @@ import 'package:movflix/models/search_model.dart';
 import 'package:movflix/models/tv_series_model.dart';
 import 'package:movflix/models/tv_series_detail_model.dart';
 import 'package:movflix/models/tv_series_recommendation_model.dart';
+import 'package:movflix/models/tv_show_video_model.dart';
+import 'package:movflix/models/upcoming_movie_model.dart' as upcoming;
+
 
 const baseUrl = 'https://api.themoviedb.org/3/';
 var key = '?api_key=$apiKey';
@@ -27,6 +30,21 @@ class ApiServices {
     }
     throw Exception('failed to load upcoming movies');
   }
+
+  static Future<List<upcoming.Result>> getUpComingMovies() async {
+    final String endPoint = 'movie/upcoming';
+    final String url = '$baseUrl$endPoint$key';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final decodedData = jsonDecode(response.body);
+      final upcomingMovies = upcoming.UpComingMovies.fromJson(decodedData);
+      return upcomingMovies.results;
+    } else {
+      throw Exception('Failed to load upcoming movies');
+    }
+  }
+
 
   Future<MovieModel> getNowPlayingMovies() async {
     endPoint = 'movie/now_playing';
@@ -54,6 +72,7 @@ class ApiServices {
 
   Future<TvSeriesModel> getTopRatedSeries() async {
     endPoint = 'tv/1396/recommendations';
+    // endPoint = 'movie/popular';
     final url = '$baseUrl$endPoint$key';
 
     final response = await http.get(Uri.parse(url));
@@ -129,5 +148,22 @@ class ApiServices {
     }
     throw Exception('Failed to load TV show recommendations');
   }
+
+  Future<TvShowVideo> getTvShowVideos(int tvShowId) async {
+
+    endPoint = 'tv/$tvShowId/videos';
+    final url = '$baseUrl$endPoint$key';
+    print(url);
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      log('Fetched TV show videos successfully');
+      return TvShowVideo.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to load TV show videos');
+  }
+
+
+
+
 
 }

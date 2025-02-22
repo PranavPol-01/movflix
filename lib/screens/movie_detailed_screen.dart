@@ -37,7 +37,8 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
     var size = MediaQuery.of(context).size;
     print(widget.movieId);
     return Scaffold(
-      body: SingleChildScrollView(
+      body: SafeArea(
+      child: SingleChildScrollView(
         child: FutureBuilder(
           future: movieDetail,
           builder: (context, snapshot) {
@@ -193,6 +194,7 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
           },
         ),
       ),
+    ),
     );
   }
 }
