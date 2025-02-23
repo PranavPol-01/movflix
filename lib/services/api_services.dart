@@ -162,6 +162,19 @@ class ApiServices {
     throw Exception('Failed to load TV show videos');
   }
 
+  Future<TvShowVideo> getMovieVideos(int tvShowId) async {
+
+    endPoint = 'movie/$tvShowId/videos';
+    final url = '$baseUrl$endPoint$key';
+    print(url);
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      log('Fetched TV movie videos successfully');
+      return TvShowVideo.fromJson(jsonDecode(response.body));
+    }
+    throw Exception('Failed to load TV show videos');
+  }
+
 
 
 

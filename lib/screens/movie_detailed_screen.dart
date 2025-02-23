@@ -4,6 +4,11 @@ import 'package:movflix/common/utils.dart';
 import 'package:movflix/models/movie_detail_model.dart';
 import 'package:movflix/models/movie_recommendation_model.dart';
 import 'package:movflix/services/api_services.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:movflix/models/tv_show_video_model.dart';
+
+
 
 class MovieDetailScreen extends StatefulWidget {
   final int movieId;
@@ -18,6 +23,11 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
 
   late Future<MovieDetailModel> movieDetail;
   late Future<MovieRecommendationsModel> movieRecommendationModel;
+  late Future<TvShowVideo> movieVideo;
+  bool isPlaying = false;
+  String? videoKey; // Store YouTube video key
+  YoutubePlayerController? _youtubeController;
+
 
   @override
   void initState() {
@@ -29,7 +39,30 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
     movieDetail = apiServices.getMovieDetail(widget.movieId);
     movieRecommendationModel =
         apiServices.getMovieRecommendations(widget.movieId);
+    movieVideo = apiServices.getMovieVideos(widget.movieId);
     setState(() {});
+  }
+  void playVideo(String key) {
+    setState(() {
+      videoKey = key;
+      isPlaying = true;
+      _youtubeController = YoutubePlayerController(
+        initialVideoId: videoKey!,
+        flags: const YoutubePlayerFlags(autoPlay: true),
+      );
+    });
+  }
+
+
+  void _shareMovie(MovieDetailModel movie) {
+    final String shareText =
+        "🎬 Check out this movie: *${movie.title}*!\n\n"
+        "📅 Released: ${movie.releaseDate.year}\n"
+        "🎭 Genre: ${movie.genres.map((genre) => genre.name).join(', ')}\n\n"
+        "📖 Overview:\n${movie.overview}\n\n"
+        "🔗 More details: https://www.themoviedb.org/movie/${movie.id}";
+
+    Share.share(shareText);
   }
 
   @override
@@ -52,8 +85,22 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                 children: [
                   Stack(
                     children: [
-                      Container(
-                        height: size.height * 0.4,
+                      isPlaying && videoKey != null
+                          ? YoutubePlayerBuilder(
+                        player: YoutubePlayer(
+                          controller: _youtubeController!,
+                          showVideoProgressIndicator: true,
+                        ),
+                        builder: (context, player) {
+                          return AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: player,
+                          );
+                        },
+                      )
+                          : Container(
+
+                      height: size.height * 0.4,
                         decoration: BoxDecoration(
                             image: DecorationImage(
                                 image: NetworkImage(
@@ -76,6 +123,24 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                         ),
                       ),
                     ],
+                  ),
+                  FutureBuilder(
+                    future: movieVideo,
+                    builder: (context, videoSnapshot) {
+                      if (videoSnapshot.hasData) {
+                        final videoData = videoSnapshot.data!;
+                        if (videoData.results.isNotEmpty) {
+                          return Center(
+                            child: ElevatedButton.icon(
+                              onPressed: () => playVideo(videoData.results.first.key),
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text('Play '),
+                            ),
+                          );
+                        }
+                      }
+                      return const SizedBox();
+                    },
                   ),
                   Padding(
                     padding:
@@ -120,7 +185,17 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                               color: Colors.white, fontSize: 16),
+                        ),const SizedBox(height: 20),
+
+
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _shareMovie(movie),
+                            icon: const Icon(Icons.share),
+                            label: const Text("Share"),
+                          ),
                         ),
+
                       ],
                     ),
                   ),

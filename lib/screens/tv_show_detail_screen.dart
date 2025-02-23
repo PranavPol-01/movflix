@@ -194,6 +194,8 @@ import 'package:movflix/models/tv_series_recommendation_model.dart';
 import 'package:movflix/models/tv_show_video_model.dart';
 import 'package:movflix/services/api_services.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+
 
 class TvShowDetailScreen extends StatefulWidget {
   final int showId;
@@ -231,6 +233,16 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
       isPlaying = true;
     });
   }
+  void _shareTvShow(String title, String overview, int showId) {
+    final String shareText =
+        "📺 Check out this TV Show: *$title*!\n\n"
+        "📖 Overview:\n$overview\n\n"
+        "🔗 More details: https://www.themoviedb.org/tv/$showId";
+
+    Share.share(shareText);
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -328,6 +340,15 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: Colors.white, fontSize: 16),
                         ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () => _shareTvShow(show.name, show.overview, show.id),
+                            icon: const Icon(Icons.share),
+                            label: const Text("Share"),
+                          ),
+                        ),
+
                       ],
                     ),
                   ),
