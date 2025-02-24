@@ -99,30 +99,55 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                         },
                       )
                           : Container(
-
-                      height: size.height * 0.4,
+                        height: size.height * 0.5,
                         decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: NetworkImage(
-                                    "$imageUrl${movie.posterPath}"),
-                                fit: BoxFit.cover)),
-                        child: SafeArea(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.arrow_back_ios,
-                                    color: Colors.white),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              )
-                            ],
+                          image: DecorationImage(
+                            image: NetworkImage("$imageUrl${movie.posterPath}"),
+                            fit: BoxFit.cover,
                           ),
                         ),
+                        child: Stack(
+                          children: [
+                            // Gradient overlay
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  stops: [0.0, 0.15, 0.5, 1.0], // Adjust the fade intensity
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+                                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // SafeArea for back button
+                            SafeArea(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+
                     ],
+                  ),
+                  const SizedBox(
+                    height: 10,
                   ),
                   FutureBuilder(
                     future: movieVideo,
@@ -131,11 +156,22 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                         final videoData = videoSnapshot.data!;
                         if (videoData.results.isNotEmpty) {
                           return Center(
-                            child: ElevatedButton.icon(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                minimumSize: Size(size.width, 50),
+                              ),
                               onPressed: () => playVideo(videoData.results.first.key),
-                              icon: const Icon(Icons.play_arrow),
-                              label: const Text('Play '),
+                              child: const Text("\u25B6 PLAY", style: TextStyle(fontSize: 16)),
                             ),
+                            // child: ElevatedButton.icon(
+                            //   onPressed: () => playVideo(videoData.results.first.key),
+                            //   icon: const Icon(Icons.play_arrow),
+                            //   label: const Text('Play '),
+                            // ),
                           );
                         }
                       }
@@ -200,7 +236,7 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                     ),
                   ),
                   const SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
                   FutureBuilder(
                     future: movieRecommendationModel,
@@ -223,39 +259,138 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
+                            // GridView.builder(
+                            //   physics:
+                            //   const NeverScrollableScrollPhysics(),
+                            //   shrinkWrap: true,
+                            //   padding: EdgeInsets.zero,
+                            //   scrollDirection: Axis.vertical,
+                            //   itemCount: movie.results.length,
+                            //   gridDelegate:
+                            //   const SliverGridDelegateWithFixedCrossAxisCount(
+                            //     crossAxisCount: 3,
+                            //     mainAxisSpacing: 15,
+                            //     childAspectRatio: 1.5 / 2,
+                            //   ),
+                            //   itemBuilder: (context, index) {
+                            //     return InkWell(
+                            //       onTap: () {
+                            //         Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //             builder: (context) =>
+                            //                 MovieDetailScreen(
+                            //                     movieId: movie
+                            //                         .results[index].id),
+                            //           ),
+                            //         );
+                            //       },
+                            //       child: CachedNetworkImage(
+                            //         imageUrl:
+                            //         "$imageUrl${movie.results[index].posterPath}",
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                             GridView.builder(
-                              physics:
-                              const NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,
                               scrollDirection: Axis.vertical,
                               itemCount: movie.results.length,
-                              gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
                                 mainAxisSpacing: 15,
-                                childAspectRatio: 1.5 / 2,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 0.55, // Increased height for better proportions
                               ),
                               itemBuilder: (context, index) {
+                                final movieItem = movie.results[index];
+
                                 return InkWell(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            MovieDetailScreen(
-                                                movieId: movie
-                                                    .results[index].id),
+                                        builder: (context) => MovieDetailScreen(movieId: movieItem.id),
                                       ),
                                     );
                                   },
-                                  child: CachedNetworkImage(
-                                    imageUrl:
-                                    "$imageUrl${movie.results[index].posterPath}",
+                                  child: Stack(
+                                    children: [
+                                      // Card with Shadow
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.3),
+                                              blurRadius: 8,
+                                              spreadRadius: 2,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: CachedNetworkImage(
+                                            imageUrl: "$imageUrl${movieItem.posterPath}",
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            placeholder: (context, url) => Container(
+                                              color: Colors.grey[900],
+                                              child: const Center(child: CircularProgressIndicator()),
+                                            ),
+                                            errorWidget: (context, url, error) => Container(
+                                              color: Colors.grey[900],
+                                              child: const Center(child: Icon(Icons.error, color: Colors.red)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Gradient Overlay for Better Visibility
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.only(
+                                              bottomLeft: Radius.circular(20),
+                                              bottomRight: Radius.circular(20),
+                                            ),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                              colors: [
+                                                Colors.black.withOpacity(0.8),
+                                                Colors.black.withOpacity(0.3),
+                                                Colors.transparent,
+                                              ],
+                                            ),
+                                          ),
+                                          child: Text(
+                                            movieItem.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },
                             ),
+
                           ],
                         );
                       }

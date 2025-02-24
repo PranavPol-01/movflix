@@ -278,47 +278,82 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                         },
                       )
                           : Container(
-                        height: size.height * 0.4,
+                        height: size.height * 0.5,
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: NetworkImage("$imageUrl${show.posterPath}"),
                             fit: BoxFit.cover,
                           ),
                         ),
-                        child: SafeArea(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
+                        child: Stack(
+                          children: [
+                            // Gradient overlay
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  stops: [0.0, 0.15, 0.5, 1.0], // Adjust the fade intensity
+                                  colors: [
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+                                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                                    Colors.transparent,
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+
+                            // SafeArea for back button
+                            SafeArea(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  // const SizedBox(height: 10),
                   FutureBuilder(
                     future: tvShowVideo,
                     builder: (context, videoSnapshot) {
                       if (videoSnapshot.hasData) {
                         final videoData = videoSnapshot.data!;
                         if (videoData.results.isNotEmpty) {
-                          return ElevatedButton.icon(
-                            onPressed: () => playVideo(videoData.results.first.key),
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('Play'),
+                          return Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                minimumSize: Size(size.width, 50),
+                              ),
+                              onPressed: () => playVideo(videoData.results.first.key),
+                              child: const Text("\u25B6 PLAY", style: TextStyle(fontSize: 16)),
+                            ),
+
                           );
                         }
                       }
                       return const SizedBox();
+
                     },
+
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
@@ -352,7 +387,7 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                   FutureBuilder(
                     future: tvShowRecommendationModel,
                     builder: (context, snapshot) {
@@ -371,34 +406,134 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
+                            // GridView.builder(
+                            //   physics: const NeverScrollableScrollPhysics(),
+                            //   shrinkWrap: true,
+                            //   padding: EdgeInsets.zero,
+                            //   scrollDirection: Axis.vertical,
+                            //   itemCount: recommendations.results.length,
+                            //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            //     crossAxisCount: 3,
+                            //     mainAxisSpacing: 15,
+                            //     childAspectRatio: 1.5 / 2,
+                            //   ),
+                            //   itemBuilder: (context, index) {
+                            //     return InkWell(
+                            //       onTap: () {
+                            //         Navigator.push(
+                            //           context,
+                            //           MaterialPageRoute(
+                            //             builder: (context) => TvShowDetailScreen(
+                            //                 showId: recommendations.results[index].id),
+                            //           ),
+                            //         );
+                            //       },
+                            //       child: CachedNetworkImage(
+                            //         imageUrl: "$imageUrl${recommendations.results[index].posterPath}",
+                            //       ),
+                            //     );
+                            //   },
+                            // ),
                             GridView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              padding: EdgeInsets.zero,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               scrollDirection: Axis.vertical,
                               itemCount: recommendations.results.length,
                               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
                                 mainAxisSpacing: 15,
-                                childAspectRatio: 1.5 / 2,
+                                crossAxisSpacing: 10,
+                                childAspectRatio: 0.55, // Adjusted to fit poster proportions
                               ),
                               itemBuilder: (context, index) {
-                                return InkWell(
+                                final show = recommendations.results[index];
+
+                                return GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => TvShowDetailScreen(
-                                            showId: recommendations.results[index].id),
+                                        builder: (context) => TvShowDetailScreen(showId: show.id),
                                       ),
                                     );
                                   },
-                                  child: CachedNetworkImage(
-                                    imageUrl: "$imageUrl${recommendations.results[index].posterPath}",
+                                  child: Stack(
+                                    children: [
+                                      // Card with Shadow
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.3),
+                                              blurRadius: 8,
+                                              spreadRadius: 2,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: CachedNetworkImage(
+                                            imageUrl: "$imageUrl${show.posterPath}",
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            placeholder: (context, url) => Container(
+                                              color: Colors.grey[900],
+                                              child: const Center(child: CircularProgressIndicator()),
+                                            ),
+                                            errorWidget: (context, url, error) => Container(
+                                              color: Colors.grey[900],
+                                              child: const Center(child: Icon(Icons.error, color: Colors.red)),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      // Gradient Overlay for Better Visibility
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.only(
+                                              bottomLeft: Radius.circular(20),
+                                              bottomRight: Radius.circular(20),
+                                            ),
+                                            gradient: LinearGradient(
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                              colors: [
+                                                Colors.black.withOpacity(0.8),
+                                                Colors.black.withOpacity(0.3),
+                                                Colors.transparent,
+                                              ],
+                                            ),
+                                          ),
+                                          child: Text(
+                                            show.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 );
                               },
                             ),
+
+
                           ],
                         );
                       }
