@@ -35,12 +35,19 @@ class UpComingMovies {
   String toRawJson() => json.encode(toJson());
 
   factory UpComingMovies.fromJson(Map<String, dynamic> json) => UpComingMovies(
-    dates: Dates.fromJson(json["dates"]),
-    page: json["page"],
-    results: List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
-    totalPages: json["total_pages"],
-    totalResults: json["total_results"],
+    dates: json["dates"] != null
+        ? Dates.fromJson(json["dates"])
+        : Dates(maximum: DateTime.now(), minimum: DateTime.now()), // Safe default
+
+    page: json["page"] ?? 1,
+    results: json["results"] != null
+        ? List<Result>.from(json["results"].map((x) => Result.fromJson(x)))
+        : [], // Return an empty list if null
+
+    totalPages: json["total_pages"] ?? 0,
+    totalResults: json["total_results"] ?? 0,
   );
+
 
   Map<String, dynamic> toJson() => {
     "dates": dates.toJson(),
@@ -155,21 +162,26 @@ class Result {
   String toRawJson() => json.encode(toJson());
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-    adult: json["adult"],
-    backdropPath: json["backdrop_path"],
-    genreIds: List<int>.from(json["genre_ids"].map((x) => x)),
-    id: json["id"],
-    originalLanguage: originalLanguageValues.map[json["original_language"]]!,
-    originalTitle: json["original_title"],
-    overview: json["overview"],
-    popularity: json["popularity"]?.toDouble(),
-    posterPath: json["poster_path"],
-    releaseDate: DateTime.parse(json["release_date"]),
-    title: json["title"],
-    video: json["video"],
-    voteAverage: json["vote_average"]?.toDouble(),
-    voteCount: json["vote_count"],
+    adult: json["adult"] ?? false,
+    backdropPath: json["backdrop_path"] ?? '',
+    genreIds: json["genre_ids"] != null
+        ? List<int>.from(json["genre_ids"].map((x) => x))
+        : [],
+    id: json["id"] ?? 0,
+    originalLanguage: originalLanguageValues.map[json["original_language"]] ?? OriginalLanguage.EN,
+    originalTitle: json["original_title"] ?? 'Unknown Title',
+    overview: json["overview"] ?? 'No description available.',
+    popularity: (json["popularity"] ?? 0.0).toDouble(),
+    posterPath: json["poster_path"] ?? '',
+    releaseDate: json["release_date"] != null
+        ? DateTime.tryParse(json["release_date"]) ?? DateTime(2000, 1, 1)
+        : DateTime(2000, 1, 1), // Fallback date
+    title: json["title"] ?? 'Unknown',
+    video: json["video"] ?? false,
+    voteAverage: (json["vote_average"] ?? 0.0).toDouble(),
+    voteCount: json["vote_count"] ?? 0,
   );
+
 
   Map<String, dynamic> toJson() => {
     "adult": adult,

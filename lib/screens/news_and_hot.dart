@@ -223,6 +223,9 @@ import 'dart:convert';
 import 'package:movflix/widgets/coming_soon_movie_widget.dart';
 import 'package:movflix/models/upcoming_movie_model.dart';
 import 'package:movflix/services/api_services.dart';
+import 'package:movflix/screens/movie_detailed_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:movflix/screens/on_boarding_screen.dart';
 
 
 class MoreScreen extends StatefulWidget {
@@ -246,18 +249,55 @@ class _MoreScreenState extends State<MoreScreen> {
   Future<void> loadUpcomingMovies() async {
     try {
       final movies = await ApiServices.getUpComingMovies();
-      setState(() {
-        upcomingMovies = movies;  // This should be a List<Result>
-      });
-    } catch (e) {
+      if (movies.isNotEmpty) {
+        setState(() {
+          upcomingMovies = movies;
+        });
+      } else {
+        print("No upcoming movies available.");
+      }
+    } catch (e, stackTrace) {
       print('Error loading upcoming movies: $e');
+      print(stackTrace);
     }
   }
 
+// Function to show the logout confirmation dialog
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close the dialog
+              await FirebaseAuth.instance.signOut();
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) =>  OnBoardingScreen()),
+                      (route) => false,
+                );
+              }
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 1,
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
@@ -267,30 +307,43 @@ class _MoreScreenState extends State<MoreScreen> {
               'New & Hot',
               style: TextStyle(color: Colors.white),
             ),
-            actions: const [
-              Padding(
+            actions:  [
+              const Padding(
                 padding: EdgeInsets.only(right: 10.0),
                 child: Icon(Icons.cast, color: Colors.white),
               ),
               SizedBox(width: 10),
-              CircleAvatar(backgroundColor: Colors.blue),
+
+              InkWell(
+                onTap: () => _showLogoutDialog(context), // Show confirmation dialog
+                child: Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade800,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  height: 30,
+                  width: 30,
+                  child: const Icon(Icons.logout, color: Colors.white, size: 20),
+                ),
+              ),
               SizedBox(width: 20),
             ],
-            bottom: TabBar(
-              dividerColor: Colors.black,
-              indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.white,
-              ),
-              labelColor: Colors.black,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              unselectedLabelColor: Colors.white,
-              tabs: const [
-                Tab(text: '  🍿 Coming Soon  '),
-                Tab(text: "  🔥 Everyone's watching  "),
-              ],
-            ),
+            // bottom: TabBar(
+            //   dividerColor: Colors.black,
+            //   indicator: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(20),
+            //     color: Colors.white,
+            //   ),
+            //   labelColor: Colors.black,
+            //   labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            //   unselectedLabelColor: Colors.white,
+            //   tabs: const [
+            //     Tab(text: "  🍿 Everyone's Watching")
+            //   ],
+            // ),
           ),
+
           body: TabBarView(
             children: [
               SingleChildScrollView(
@@ -301,17 +354,19 @@ class _MoreScreenState extends State<MoreScreen> {
                     logoUrl: 'https://image.tmdb.org/t/p/w500${movie.backdropPath}',
                     month: movie.releaseDate.month.toString(),
                     day: movie.releaseDate.day.toString(),
+                    movieId: movie.id, // Pass movieId for navigation
                   )).toList(),
                 ),
               ),
-              const Center(child: Text("🔥 Everyone's watching")),
             ],
           ),
+
         ),
       ),
     );
   }
 }
+
 
 
 class ComingSoonMovieWidget extends StatelessWidget {
@@ -320,6 +375,7 @@ class ComingSoonMovieWidget extends StatelessWidget {
   final String logoUrl;
   final String month;
   final String day;
+  final int movieId; // Add movieId for navigation
 
   const ComingSoonMovieWidget({
     super.key,
@@ -328,6 +384,7 @@ class ComingSoonMovieWidget extends StatelessWidget {
     required this.logoUrl,
     required this.month,
     required this.day,
+    required this.movieId, // Pass movieId
   });
 
   @override
@@ -349,21 +406,53 @@ class ComingSoonMovieWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailScreen(movieId: movieId),
+                      ),
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
-                    CachedNetworkImage(imageUrl: logoUrl, alignment: Alignment.centerLeft, height: 50,),
+                    CachedNetworkImage(imageUrl: logoUrl, alignment: Alignment.centerLeft, height: 45),
                     const SizedBox(width: 10),
+                    // Text('Watch Now', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5)),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MovieDetailScreen(movieId: movieId),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Watch Now',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.5,
+                          color: Colors.red, // Make it visually distinct
+                          // decoration: TextDecoration.underline, // Optional underline
+                        ),
+                      ),
+                    ),
 
-                    Text('Coming on $day/$month', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16.5)),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Text(overview, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey, fontSize: 12.5)),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

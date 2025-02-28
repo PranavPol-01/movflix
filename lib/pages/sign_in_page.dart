@@ -50,6 +50,9 @@ class _SignInPageState extends State<SignInPage> {
           MaterialPageRoute(builder: (context) => HomeScreen()),
               (route) => false,
         );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       setState(() {

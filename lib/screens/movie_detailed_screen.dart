@@ -156,22 +156,18 @@ class MovieDetailScreenState extends State<MovieDetailScreen> {
                         final videoData = videoSnapshot.data!;
                         if (videoData.results.isNotEmpty) {
                           return Center(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade800,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  minimumSize: Size(MediaQuery.of(context).size.width, 50),
                                 ),
-                                minimumSize: Size(size.width, 50),
+                                onPressed: () => playVideo(videoData.results.first.key),
+                                icon: const Icon(Icons.play_arrow, color: Colors.white, size: 24), // Play Icon
+                                label: const Text("PLAY", style: TextStyle(fontSize: 16, color: Colors.white)),
                               ),
-                              onPressed: () => playVideo(videoData.results.first.key),
-                              child: const Text("\u25B6 PLAY", style: TextStyle(fontSize: 16)),
-                            ),
-                            // child: ElevatedButton.icon(
-                            //   onPressed: () => playVideo(videoData.results.first.key),
-                            //   icon: const Icon(Icons.play_arrow),
-                            //   label: const Text('Play '),
-                            // ),
                           );
                         }
                       }

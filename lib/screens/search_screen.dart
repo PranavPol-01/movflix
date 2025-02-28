@@ -290,21 +290,29 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _startListening() async {
     bool available = await speech.initialize(
       onStatus: (status) {
-        if (status == "done") {
+        if (status == "done" && mounted) {
           setState(() => isListening = false);
-          Navigator.pop(context); // Close "Listening..." dialog
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context); // Close "Listening..." dialog
+          }
         }
       },
       onError: (error) {
-        setState(() => isListening = false);
-        Navigator.pop(context); // Close "Listening..." dialog
+        if (mounted) {
+          setState(() => isListening = false);
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context); // Close "Listening..." dialog
+          }
+        }
       },
     );
 
     if (available) {
+      if (!mounted) return; // Ensure widget is still in the tree
+
       setState(() {
         isListening = true;
-        searchedMovie = null; // Clear previous results
+        searchedMovie = null;
         searchController.clear();
       });
 
@@ -333,23 +341,28 @@ class _SearchScreenState extends State<SearchScreen> {
 
       speech.listen(
         onResult: (result) {
-          setState(() {
-            searchController.text = result.recognizedWords;
-            search(searchController.text);
-          });
+          if (mounted) {
+            setState(() {
+              searchController.text = result.recognizedWords;
+              search(searchController.text);
+            });
+          }
         },
       );
 
-      // Close dialog & stop listening after 5 seconds
+      // Stop listening after 5 seconds
       Future.delayed(const Duration(seconds: 5), () {
-        speech.stop();
-        setState(() => isListening = false);
-        if (Navigator.canPop(context)) {
-          Navigator.pop(context); // Close "Listening..." dialog
+        if (mounted) {
+          speech.stop();
+          setState(() => isListening = false);
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context); // Close "Listening..." dialog
+          }
         }
       });
     }
   }
+
 
 
 

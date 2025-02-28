@@ -329,30 +329,33 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                   FutureBuilder(
                     future: tvShowVideo,
                     builder: (context, videoSnapshot) {
-                      if (videoSnapshot.hasData) {
+                      if (videoSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator()); // Show loading indicator
+                      } else if (videoSnapshot.hasError) {
+                        return const Center(child: Text("Error loading video"));
+                      } else if (videoSnapshot.hasData) {
                         final videoData = videoSnapshot.data!;
                         if (videoData.results.isNotEmpty) {
                           return Center(
-                            child: ElevatedButton(
+                            child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
+                                backgroundColor: Colors.red.shade800,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5),
                                 ),
-                                minimumSize: Size(size.width, 50),
+                                minimumSize: Size(MediaQuery.of(context).size.width, 50),
                               ),
                               onPressed: () => playVideo(videoData.results.first.key),
-                              child: const Text("\u25B6 PLAY", style: TextStyle(fontSize: 16)),
+                              icon: const Icon(Icons.play_arrow, color: Colors.white, size: 24), // Play Icon
+                              label: const Text("PLAY", style: TextStyle(fontSize: 16, color: Colors.white)),
                             ),
-
                           );
                         }
                       }
-                      return const SizedBox();
-
+                      return const SizedBox(); // Return an empty widget if no data
                     },
-
                   ),
+
 
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -406,34 +409,7 @@ class TvShowDetailScreenState extends State<TvShowDetailScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            // GridView.builder(
-                            //   physics: const NeverScrollableScrollPhysics(),
-                            //   shrinkWrap: true,
-                            //   padding: EdgeInsets.zero,
-                            //   scrollDirection: Axis.vertical,
-                            //   itemCount: recommendations.results.length,
-                            //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            //     crossAxisCount: 3,
-                            //     mainAxisSpacing: 15,
-                            //     childAspectRatio: 1.5 / 2,
-                            //   ),
-                            //   itemBuilder: (context, index) {
-                            //     return InkWell(
-                            //       onTap: () {
-                            //         Navigator.push(
-                            //           context,
-                            //           MaterialPageRoute(
-                            //             builder: (context) => TvShowDetailScreen(
-                            //                 showId: recommendations.results[index].id),
-                            //           ),
-                            //         );
-                            //       },
-                            //       child: CachedNetworkImage(
-                            //         imageUrl: "$imageUrl${recommendations.results[index].posterPath}",
-                            //       ),
-                            //     );
-                            //   },
-                            // ),
+
                             GridView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,

@@ -122,29 +122,19 @@ class Result {
 //     required this.totalResults,
 //   });
 //
-//   TvSeriesModel copyWith({
-//     int? page,
-//     List<Result>? results,
-//     int? totalPages,
-//     int? totalResults,
-//   }) =>
-//       TvSeriesModel(
-//         page: page ?? this.page,
-//         results: results ?? this.results,
-//         totalPages: totalPages ?? this.totalPages,
-//         totalResults: totalResults ?? this.totalResults,
-//       );
-//
-//   factory TvSeriesModel.fromRawJson(String str) => TvSeriesModel.fromJson(json.decode(str));
+//   factory TvSeriesModel.fromRawJson(String str) =>
+//       TvSeriesModel.fromJson(json.decode(str));
 //
 //   String toRawJson() => json.encode(toJson());
 //
-//   factory TvSeriesModel.fromJson(Map<String, dynamic> json) => TvSeriesModel(
-//     page: json["page"],
-//     results: List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
-//     totalPages: json["total_pages"],
-//     totalResults: json["total_results"],
-//   );
+//   factory TvSeriesModel.fromJson(Map<String, dynamic> json) =>
+//       TvSeriesModel(
+//         page: json["page"],
+//         results:
+//         List<Result>.from(json["results"].map((x) => Result.fromJson(x))),
+//         totalPages: json["total_pages"],
+//         totalResults: json["total_results"],
+//       );
 //
 //   Map<String, dynamic> toJson() => {
 //     "page": page,
@@ -187,39 +177,6 @@ class Result {
 //     required this.voteCount,
 //   });
 //
-//   Result copyWith({
-//     bool? adult,
-//     String? backdropPath,
-//     List<int>? genreIds,
-//     int? id,
-//     String? originalLanguage,
-//     String? originalTitle,
-//     String? overview,
-//     double? popularity,
-//     String? posterPath,
-//     DateTime? releaseDate,
-//     String? title,
-//     bool? video,
-//     double? voteAverage,
-//     int? voteCount,
-//   }) =>
-//       Result(
-//         adult: adult ?? this.adult,
-//         backdropPath: backdropPath ?? this.backdropPath,
-//         genreIds: genreIds ?? this.genreIds,
-//         id: id ?? this.id,
-//         originalLanguage: originalLanguage ?? this.originalLanguage,
-//         originalTitle: originalTitle ?? this.originalTitle,
-//         overview: overview ?? this.overview,
-//         popularity: popularity ?? this.popularity,
-//         posterPath: posterPath ?? this.posterPath,
-//         releaseDate: releaseDate ?? this.releaseDate,
-//         title: title ?? this.title,
-//         video: video ?? this.video,
-//         voteAverage: voteAverage ?? this.voteAverage,
-//         voteCount: voteCount ?? this.voteCount,
-//       );
-//
 //   factory Result.fromRawJson(String str) => Result.fromJson(json.decode(str));
 //
 //   String toRawJson() => json.encode(toJson());
@@ -251,7 +208,8 @@ class Result {
 //     "overview": overview,
 //     "popularity": popularity,
 //     "poster_path": posterPath,
-//     "release_date": "${releaseDate.year.toString().padLeft(4, '0')}-${releaseDate.month.toString().padLeft(2, '0')}-${releaseDate.day.toString().padLeft(2, '0')}",
+//     "release_date":
+//     "${releaseDate.year.toString().padLeft(4, '0')}-${releaseDate.month.toString().padLeft(2, '0')}-${releaseDate.day.toString().padLeft(2, '0')}",
 //     "title": title,
 //     "video": video,
 //     "vote_average": voteAverage,

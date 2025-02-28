@@ -13,6 +13,9 @@ import 'package:movflix/models/tv_series_recommendation_model.dart';
 import 'package:movflix/models/tv_show_video_model.dart';
 import 'package:movflix/models/upcoming_movie_model.dart' as upcoming;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 const baseUrl = 'https://api.themoviedb.org/3/';
 var key = '?api_key=$apiKey';
@@ -36,6 +39,8 @@ class ApiServices {
     final String url = '$baseUrl$endPoint$key';
 
     final response = await http.get(Uri.parse(url));
+    print(response.body);
+
     if (response.statusCode == 200) {
       final decodedData = jsonDecode(response.body);
       final upcomingMovies = upcoming.UpComingMovies.fromJson(decodedData);
@@ -71,7 +76,7 @@ class ApiServices {
   }
 
   Future<TvSeriesModel> getTopRatedSeries() async {
-    endPoint = 'tv/1396/recommendations';
+    endPoint = 'tv/1399/recommendations';
     // endPoint = 'movie/popular';
     final url = '$baseUrl$endPoint$key';
 
@@ -95,17 +100,80 @@ class ApiServices {
     throw Exception('failed to load  movie details');
   }
 
+  // Future<MovieRecommendationsModel> getMovieRecommendations(int movieId) async {
+  //   endPoint = 'movie/$movieId/recommendations';
+  //   final url = '$baseUrl$endPoint$key';
+  //
+  //   final response = await http.get(Uri.parse(url));
+  //   if (response.statusCode == 200) {
+  //     log('success');
+  //     return MovieRecommendationsModel.fromJson(jsonDecode(response.body));
+  //   }
+  //   throw Exception('failed to load  movie details');
+  // }
+
   Future<MovieRecommendationsModel> getMovieRecommendations(int movieId) async {
     endPoint = 'movie/$movieId/recommendations';
     final url = '$baseUrl$endPoint$key';
 
     final response = await http.get(Uri.parse(url));
+
     if (response.statusCode == 200) {
-      log('success');
+      log('API success');
       return MovieRecommendationsModel.fromJson(jsonDecode(response.body));
+    } else {
+      log(
+          'API failed, fetching recommendations from Firebase for movieId 939243');
+      return getRecommendationsFromFirebase(939243);
     }
-    throw Exception('failed to load  movie details');
   }
+
+  Future<MovieRecommendationsModel> getRecommendationsFromFirebase(
+      int movieId) async {
+    final ref = FirebaseDatabase.instance.ref('recommendations/$movieId');
+    final snapshot = await ref.get();
+
+    if (snapshot.exists) {
+      log('Firebase data found');
+      return MovieRecommendationsModel.fromJson(
+          jsonDecode(jsonEncode(snapshot.value)));
+    } else {
+      throw Exception('No recommendations found in Firebase');
+    }
+  }
+
+
+  // Future<MovieRecommendationsModel> getMovieRecommendations(int movieId) async {
+  //   endPoint = 'movie/$movieId/recommendations';
+  //   final url = '$baseUrl$endPoint$key';
+  //
+  //   final response = await http.get(Uri.parse(url));
+  //
+  //   if (response.statusCode == 200) {
+  //     log('Fetched movie recommendations successfully');
+  //     final movieRecommendations = MovieRecommendationsModel.fromJson(jsonDecode(response.body));
+  //
+  //     // Store in Firestore
+  //     await saveRecommendationsToFirestore(movieId, jsonDecode(response.body));
+  //
+  //     return movieRecommendations;
+  //   }
+  //   throw Exception('Failed to load movie recommendations');
+  // }
+
+  // Future<void> saveRecommendationsToFirestore(int movieId, Map<String, dynamic> data) async {
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //   CollectionReference recommendationsCollection = firestore.collection('movie_recommendations');
+  //
+  //   await recommendationsCollection.doc(movieId.toString()).set({
+  //     'movie_id': movieId,
+  //     'recommendations': data['results'],
+  //     'timestamp': FieldValue.serverTimestamp(),
+  //   });
+  //
+  //   log("Movie recommendations saved to Firestore.");
+  // }
+
 
   Future<SearchModel> getSearchedMovie(String searchText) async {
     endPoint = 'search/movie?query=$searchText';
@@ -124,7 +192,6 @@ class ApiServices {
   }
 
 
-
   Future<TvShowDetailModel> getTvShowDetail(int tvShowId) async {
     endPoint = 'tv/$tvShowId';
     final url = '$baseUrl$endPoint$key';
@@ -137,7 +204,8 @@ class ApiServices {
     throw Exception('Failed to load TV show details');
   }
 
-  Future<TvShowRecommendationsModel> getTvShowRecommendations(int tvShowId) async {
+  Future<TvShowRecommendationsModel> getTvShowRecommendations(
+      int tvShowId) async {
     endPoint = 'tv/$tvShowId/recommendations';
     final url = '$baseUrl$endPoint$key';
     print(url);
@@ -145,12 +213,28 @@ class ApiServices {
     if (response.statusCode == 200) {
       log('Fetched TV show recommendations successfully');
       return TvShowRecommendationsModel.fromJson(jsonDecode(response.body));
+    }else{
+      log('Failed to load TV show recommendations');
+      return getRecommendationsFromFirebaseTV(939243);
     }
-    throw Exception('Failed to load TV show recommendations');
+
+  }
+
+  Future<TvShowRecommendationsModel> getRecommendationsFromFirebaseTV(
+      int movieId) async {
+    final ref = FirebaseDatabase.instance.ref('recommendations/$movieId');
+    final snapshot = await ref.get();
+
+    if (snapshot.exists) {
+      log('Firebase data found');
+      return TvShowRecommendationsModel.fromJson(
+          jsonDecode(jsonEncode(snapshot.value)));
+    } else {
+      throw Exception('No recommendations found in Firebase');
+    }
   }
 
   Future<TvShowVideo> getTvShowVideos(int tvShowId) async {
-
     endPoint = 'tv/$tvShowId/videos';
     final url = '$baseUrl$endPoint$key';
     print(url);
@@ -163,7 +247,6 @@ class ApiServices {
   }
 
   Future<TvShowVideo> getMovieVideos(int tvShowId) async {
-
     endPoint = 'movie/$tvShowId/videos';
     final url = '$baseUrl$endPoint$key';
     print(url);
@@ -176,7 +259,6 @@ class ApiServices {
   }
 
 
-
-
-
 }
+
+

@@ -120,22 +120,25 @@ class Result {
   String toRawJson() => json.encode(toJson());
 
   factory Result.fromJson(Map<String, dynamic> json) => Result(
-    backdropPath: json["backdrop_path"],
-    id: json["id"],
-    name: json["name"],
-    originalName: json["original_name"],
-    overview: json["overview"],
-    posterPath: json["poster_path"],
-    mediaType: mediaTypeValues.map[json["media_type"]]!,
-    adult: json["adult"],
-    originalLanguage: originalLanguageValues.map[json["original_language"]]!,
-    genreIds: List<int>.from(json["genre_ids"].map((x) => x)),
-    popularity: json["popularity"]?.toDouble(),
-    firstAirDate: DateTime.parse(json["first_air_date"]),
-    voteAverage: json["vote_average"]?.toDouble(),
-    voteCount: json["vote_count"],
-    originCountry: List<OriginCountry>.from(json["origin_country"].map((x) => originCountryValues.map[x]!)),
+    backdropPath: json["backdrop_path"] ?? "", // Provide a default empty string if null
+    id: json["id"] ?? 0, // Default ID to 0
+    name: json["name"] ?? "Unknown",
+    originalName: json["original_name"] ?? "Unknown",
+    overview: json["overview"] ?? "No description available",
+    posterPath: json["poster_path"] ?? "",
+    mediaType: mediaTypeValues.map[json["media_type"]] ?? MediaType.TV, // Use default MediaType.TV
+    adult: json["adult"] ?? false,
+    originalLanguage: originalLanguageValues.map[json["original_language"]] ?? OriginalLanguage.EN,
+    genreIds: json["genre_ids"] != null ? List<int>.from(json["genre_ids"].map((x) => x)) : [],
+    popularity: (json["popularity"] ?? 0.0).toDouble(),
+    firstAirDate: json["first_air_date"] != null ? DateTime.parse(json["first_air_date"]) : DateTime(2000, 1, 1),
+    voteAverage: (json["vote_average"] ?? 0.0).toDouble(),
+    voteCount: json["vote_count"] ?? 0,
+    originCountry: json["origin_country"] != null
+        ? List<OriginCountry>.from(json["origin_country"].map((x) => originCountryValues.map[x] ?? OriginCountry.US))
+        : [],
   );
+
 
   Map<String, dynamic> toJson() => {
     "backdrop_path": backdropPath,
